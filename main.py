@@ -1,5 +1,4 @@
 import pygame, sys
-from world import *
 
 clock = pygame.time.Clock()
 
@@ -21,6 +20,7 @@ player_y_momentum = 0
 grass_image = pygame.image.load('./img/ground.png').convert_alpha()
 dirt_image = pygame.image.load('./img/underground.png').convert_alpha()
 stone_image = pygame.image.load('./img/stone.png').convert_alpha()
+trunk_image = pygame.image.load('./img/wood.png').convert_alpha()
 
 def load_map(path):
 	f = open(path + '.txt','r')
@@ -89,6 +89,8 @@ while True:
 	for layer in game_map:
 		x = 0
 		for tile in layer:
+			if tile == '4':
+				screen.blit(trunk_image, (x*8-scroll[0], y*8-scroll[1]))
 			if tile == '3':
 				screen.blit(stone_image, (x*8-scroll[0],y*8-scroll[1]))
 			if tile == '2':
@@ -133,6 +135,7 @@ while True:
 			if event.key == pygame.K_UP:
 				if air_timer < 0.5:
 					player_y_momentum = -1.5
+					game_map = load_map('map2')
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_RIGHT:
 				moving_right = False
