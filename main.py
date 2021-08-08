@@ -1,6 +1,7 @@
 import pygame, sys
 
 clock = pygame.time.Clock()
+dt = min(clock.tick(60)/1000, 0.016)
 
 pygame.init()
 pygame.display.set_caption('lowrezjam 2021')
@@ -46,7 +47,7 @@ def collision_test(rect, tiles):
 
 def move(rect, movement, tiles):
 	collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
-	rect.x += movement[0]
+	rect.x += movement[0] 
 	hit_list = collision_test(rect, tiles)
 	for tile in hit_list:
 		if movement[0] > 0:
@@ -55,7 +56,7 @@ def move(rect, movement, tiles):
 		elif movement[0] < 0:
 			rect.left = tile.right
 			collision_types['left'] = True
-	rect.y += movement[1]
+	rect.y += movement[1] 
 	hit_list = collision_test(rect, tiles)
 	for tile in hit_list:
 		if movement[1] > 0:
@@ -112,12 +113,12 @@ while True:
 		y += 1
 
 	player_movement = [0, 0]
-	if moving_right:
-		player_movement[0] += 1
 	if moving_left:
-		player_movement[0] -= 1
+		player_movement[0] -= 1 * dt
+	if moving_right:
+		player_movement[0] += 1 * dt
 	player_movement[1] += player_y_momentum
-	player_y_momentum += 0.1
+	player_y_momentum += 0.1 * dt
 	if player_y_momentum > 1.5:
 		player_y_momentum = 1.5
 
@@ -152,4 +153,4 @@ while True:
 
 
 	pygame.display.update()
-	clock.tick(60)
+	dt = min(clock.tick(60)/1000, 0.016)
