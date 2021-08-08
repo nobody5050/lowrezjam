@@ -114,11 +114,11 @@ while True:
 
 	player_movement = [0, 0]
 	if moving_left:
-		player_movement[0] -= 1 * dt
+		player_movement[0] -= 1
 	if moving_right:
-		player_movement[0] += 1 * dt
+		player_movement[0] += 1
 	player_movement[1] += player_y_momentum
-	player_y_momentum += 0.1 * dt
+	player_y_momentum += 0.1
 	if player_y_momentum > 1.5:
 		player_y_momentum = 1.5
 
