@@ -7,15 +7,19 @@ pygame.display.set_caption('lowrezjam 2021')
 screen = pygame.display.set_mode((64, 64), pygame.SCALED)
 
 player_image = pygame.image.load('./img/player/player.png').convert_alpha()
-#player_image = pygame.image.load('./img/test image.png')
 
 moving_left = False
 moving_right = False
 
-#player_coords = [0, 0]
 player_y_momentum = 0
+air_timer = 0
 
-#player_rect = pygame.Rect(player_coords[0], player_coords[1], player_image.get_width(), player_image.get_height())
+true_scroll = [0,0]
+
+level_number = 1
+
+player_rect = pygame.Rect(24, 73, player_image.get_width(), player_image.get_height())
+test_rect = pygame.Rect(100,100,100,50)
 
 grass_image = pygame.image.load('./img/ground.png').convert_alpha()
 dirt_image = pygame.image.load('./img/underground.png').convert_alpha()
@@ -31,8 +35,6 @@ def load_map(path):
 	for row in data:
 		game_map.append(list(row))
 	return game_map
-
-game_map = load_map('map')
 
 def collision_test(rect, tiles):
 	hit_list = []
@@ -63,16 +65,19 @@ def move(rect, movement, tiles):
 			collision_types['top'] = True
 	return rect, collision_types
 
-moving_right = False
-moving_left = False
+def draw_hardcoded():
+	pygame.draw.rect(screen,(0, 255, 0),(63-scroll[0],57-scroll[1],10,10))
 
-player_y_momentum = 0
-air_timer = 0
+def advance_level():
+	global game_map, level_number
+	try:
+		game_map = load_map('map' + str(level_number))
+	except:
+		print('no more levels!')
+	level_number += 1
+	return level_number
 
-true_scroll = [0,0]
-
-player_rect = pygame.Rect(24, 73, player_image.get_width(), player_image.get_height())
-test_rect = pygame.Rect(100,100,100,50)
+advance_level()
 
 while True:
 
@@ -97,7 +102,7 @@ while True:
 				screen.blit(dirt_image,(x*8-scroll[0],y*8-scroll[1]))
 			if tile == '1':
 				screen.blit(grass_image,(x*8-scroll[0],y*8-scroll[1]))
-			if tile != '0':
+			if tile != '0' and tile != '4':
 				tile_rects.append(pygame.Rect(x*8,y*8,8,8))
 			x += 1
 		y += 1
@@ -113,7 +118,6 @@ while True:
 		player_y_momentum = 1.5
 
 	player_rect, collisions = move(player_rect, player_movement, tile_rects)
-	print(player_rect)
 
 	if collisions['bottom']:
 		player_y_momentum = 0
@@ -135,7 +139,7 @@ while True:
 			if event.key == pygame.K_UP:
 				if air_timer < 0.5:
 					player_y_momentum = -1.5
-					game_map = load_map('map2')
+					advance_level()
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_RIGHT:
 				moving_right = False
