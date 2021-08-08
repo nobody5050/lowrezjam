@@ -25,6 +25,7 @@ grass_image = pygame.image.load('./img/ground.png').convert_alpha()
 dirt_image = pygame.image.load('./img/underground.png').convert_alpha()
 stone_image = pygame.image.load('./img/stone.png').convert_alpha()
 trunk_image = pygame.image.load('./img/wood.png').convert_alpha()
+leaf_image = pygame.image.load('./img/leaf.png').convert_alpha()
 
 def load_map(path):
 	f = open(path + '.txt','r')
@@ -80,8 +81,9 @@ def advance_level():
 advance_level()
 
 while True:
-
-	screen.fill((34, 32, 52))
+	
+	screen.fill((99, 155, 255))
+	#screen.fill((34, 32, 52))
 
 	true_scroll[0] += (player_rect.x-true_scroll[0]-32)/20
 	true_scroll[1] += (player_rect.y-true_scroll[1]-32)/20
@@ -94,6 +96,8 @@ while True:
 	for layer in game_map:
 		x = 0
 		for tile in layer:
+			if tile == '5':
+				screen.blit(leaf_image, (x*8-scroll[0], y*8-scroll[1]))
 			if tile == '4':
 				screen.blit(trunk_image, (x*8-scroll[0], y*8-scroll[1]))
 			if tile == '3':
@@ -102,7 +106,7 @@ while True:
 				screen.blit(dirt_image,(x*8-scroll[0],y*8-scroll[1]))
 			if tile == '1':
 				screen.blit(grass_image,(x*8-scroll[0],y*8-scroll[1]))
-			if tile != '0' and tile != '4':
+			if tile != '0' and tile != '4' and tile != '5':
 				tile_rects.append(pygame.Rect(x*8,y*8,8,8))
 			x += 1
 		y += 1
@@ -139,7 +143,7 @@ while True:
 			if event.key == pygame.K_UP:
 				if air_timer < 0.5:
 					player_y_momentum = -1.5
-					advance_level()
+					#advance_level()
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_RIGHT:
 				moving_right = False
