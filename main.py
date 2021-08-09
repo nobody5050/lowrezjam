@@ -19,8 +19,46 @@ true_scroll = [0,0]
 
 level_number = 1
 
-player_rect = pygame.Rect(24, 73, player_image.get_width(), player_image.get_height())
+global animation_frames
+animation_frames = {}
+
+def load_animation(path,frame_durations):
+    global animation_frames
+    animation_name = path.split('/')[-1]
+    animation_frame_data = []
+    n = 0
+    for frame in frame_durations:
+        animation_frame_id = animation_name + '_' + str(n)
+        img_loc = path + '/' + animation_frame_id + '.png'
+        # player_animations/idle/idle_0.png
+        animation_image = pygame.image.load(img_loc).convert()
+        animation_image.set_colorkey((255,255,255))
+        animation_frames[animation_frame_id] = animation_image.copy()
+        for i in range(frame):
+            animation_frame_data.append(animation_frame_id)
+        n += 1
+    return animation_frame_data
+
+def change_action(action_var,frame,new_value):
+    if action_var != new_value:
+        action_var = new_value
+        frame = 0
+    return action_var,frame
+        
+
+animation_database = {}
+
+#animation_database['run'] = load_animation('player_animations/run',[7,7])
+#animation_database['idle'] = load_animation('player_animations/idle',[7,7,40])
+
+player_rect = pygame.Rect(24, 41, player_image.get_width(), player_image.get_height())
 test_rect = pygame.Rect(100,100,100,50)
+
+game_map = {}
+
+player_action = 'idle'
+player_frame = 0
+player_flip = False
 
 grass_image = pygame.image.load('./img/ground.png').convert_alpha()
 dirt_image = pygame.image.load('./img/underground.png').convert_alpha()
@@ -35,6 +73,12 @@ leaf_bottom = pygame.image.load('./img/leaf_oneSide_bottom.png')
 leaf_top = pygame.image.load('./img/leaf_oneSide_top.png')
 
 tuft_image = pygame.image.load('./img/tuft.png').convert_alpha()
+
+tile_index = {1:grass_image,
+              2:dirt_image,
+              3:stone_image,
+			  4:trunk_image
+              }
 
 def load_map(path):
 	f = open(path + '.txt','r')
@@ -89,7 +133,18 @@ def advance_level():
 
 advance_level()
 
+game_map = [['3','3','3','3','3'],
+			['0','0','0','0','0'],
+			['0','0','0','0','0'],
+			['0','0','0','0','0'],
+			['0','0','0','0','0'],
+			['5','5','5','5','5'],
+			['1','1','1','1','1'],
+			['2','2','2','2','2'],
+			['3','3','3','3','3']]
+
 while True:
+	
 	
 	screen.fill((130, 139, 245))
 	#screen.fill((34, 32, 52))
