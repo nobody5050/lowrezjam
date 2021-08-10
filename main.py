@@ -7,6 +7,29 @@ pygame.init()
 pygame.display.set_caption('lowrezjam 2021')
 screen = pygame.display.set_mode((64, 64), pygame.SCALED)
 
+level_number = 1
+
+def title():
+	title = True
+	while title:
+
+		image = pygame.image.load('./img/title.png')
+
+		screen.blit(image, (0,0))
+
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				sys.exit()
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_RETURN:
+					title = False
+		pygame.display.update()
+		dt = min(clock.tick(60)/1000, 0.016)
+
+title()
+
+dt = min(clock.tick(60)/1000, 0.016)
 player_image = pygame.image.load('./img/player/player.png').convert_alpha()
 
 moving_left = False
@@ -17,41 +40,39 @@ air_timer = 0
 
 true_scroll = [0,0]
 
-level_number = 1
-
 global animation_frames
 animation_frames = {}
 
 def load_animation(path,frame_durations):
-    global animation_frames
-    animation_name = path.split('/')[-1]
-    animation_frame_data = []
-    n = 0
-    for frame in frame_durations:
-        animation_frame_id = animation_name + '_' + str(n)
-        img_loc = path + '/' + animation_frame_id + '.png'
-        # player_animations/idle/idle_0.png
-        animation_image = pygame.image.load(img_loc).convert()
-        animation_image.set_colorkey((255,255,255))
-        animation_frames[animation_frame_id] = animation_image.copy()
-        for i in range(frame):
-            animation_frame_data.append(animation_frame_id)
-        n += 1
-    return animation_frame_data
+	global animation_frames
+	animation_name = path.split('/')[-1]
+	animation_frame_data = []
+	n = 0
+	for frame in frame_durations:
+		animation_frame_id = animation_name + '_' + str(n)
+		img_loc = path + '/' + animation_frame_id + '.png'
+		# player_animations/idle/idle_0.png
+		animation_image = pygame.image.load(img_loc).convert()
+		animation_image.set_colorkey((255,255,255))
+		animation_frames[animation_frame_id] = animation_image.copy()
+		for i in range(frame):
+			animation_frame_data.append(animation_frame_id)
+		n += 1
+	return animation_frame_data
 
 def change_action(action_var,frame,new_value):
-    if action_var != new_value:
-        action_var = new_value
-        frame = 0
-    return action_var,frame
-        
+	if action_var != new_value:
+		action_var = new_value
+		frame = 0
+	return action_var,frame
+		
 
 animation_database = {}
 
 #animation_database['run'] = load_animation('player_animations/run',[7,7])
 #animation_database['idle'] = load_animation('player_animations/idle',[7,7,40])
 
-player_rect = pygame.Rect(24, 41, player_image.get_width(), player_image.get_height())
+player_rect = pygame.Rect(0, 169, player_image.get_width(), player_image.get_height())
 test_rect = pygame.Rect(100,100,100,50)
 
 game_map = {}
@@ -64,6 +85,13 @@ grass_image = pygame.image.load('./img/ground.png').convert_alpha()
 dirt_image = pygame.image.load('./img/underground.png').convert_alpha()
 stone_image = pygame.image.load('./img/stone.png').convert_alpha()
 trunk_image = pygame.image.load('./img/wood.png').convert_alpha()
+plank_image = pygame.image.load('./img/plank.png').convert_alpha()
+stair_image = pygame.image.load('./img/stair.png').convert_alpha()
+stair_flipped = pygame.image.load('./img/stair_flipped.png').convert_alpha()
+
+door_bottom = pygame.image.load('./img/door_bottom.png').convert_alpha()
+door_top = pygame.image.load('./img/door_top.png').convert_alpha()
+
 
 leaf_top_left = pygame.image.load('./img/leaf_twoSide_topleft.png').convert_alpha()
 leaf_bottom_left = pygame.image.load('./img/leaf_twoSide_bottomLeft.png').convert_alpha()
@@ -75,10 +103,10 @@ leaf_top = pygame.image.load('./img/leaf_oneSide_top.png')
 tuft_image = pygame.image.load('./img/tuft.png').convert_alpha()
 
 tile_index = {1:grass_image,
-              2:dirt_image,
-              3:stone_image,
-			  4:trunk_image
-              }
+			2:dirt_image,
+			3:stone_image,
+			4:trunk_image
+			}
 
 def load_map(path):
 	f = open(path + '.txt','r')
@@ -132,22 +160,21 @@ def advance_level():
 	return level_number
 
 advance_level()
-
-game_map = [['3','3','3','3','3'],
-			['0','0','0','0','0'],
-			['0','0','0','0','0'],
-			['0','0','0','0','0'],
-			['0','0','0','0','0'],
-			['5','5','5','5','5'],
-			['1','1','1','1','1'],
-			['2','2','2','2','2'],
-			['3','3','3','3','3']]
+Game = True
 
 while True:
-	
+	print(game_map)
+
+	if Game == True:
+		if player_rect.x > 80 and player_rect.x < 200:
+			Game = False
+			advance_level()
+	if Game == False:
+		print(player_rect)
+		if player_rect.x < 80 or player_rect.x > 200:
+			Game = True
 	
 	screen.fill((130, 139, 245))
-	#screen.fill((34, 32, 52))
 
 	true_scroll[0] += (player_rect.x-true_scroll[0]-32)/20
 	true_scroll[1] += (player_rect.y-true_scroll[1]-32)/20
@@ -160,6 +187,16 @@ while True:
 	for layer in game_map:
 		x = 0
 		for tile in layer:
+			if tile == 'f':
+				screen.blit(stair_flipped, (x*8-scroll[0], y*8-scroll[1]))
+			if tile == 's':
+				screen.blit(stair_image, (x*8-scroll[0], y*8-scroll[1]))
+			if tile == 'p':
+				screen.blit(plank_image, (x*8-scroll[0], y*8-scroll[1]))
+			if tile == 'D':
+				screen.blit(door_top, (x*8-scroll[0], y*8-scroll[1]))
+			if tile == 'd':
+				screen.blit(door_bottom, (x*8-scroll[0], y*8-scroll[1]))
 			if tile == '5':
 				screen.blit(tuft_image, (x*8-scroll[0], y*8-scroll[1]))
 			if tile == '6':
@@ -182,7 +219,7 @@ while True:
 				screen.blit(dirt_image,(x*8-scroll[0],y*8-scroll[1]))
 			if tile == '1':
 				screen.blit(grass_image,(x*8-scroll[0],y*8-scroll[1]))
-			if tile != '0' and tile != '4' and tile != '5' and tile != '6' and tile != '7' and tile != '8' and tile != '9' and tile != 'b' and tile != 't':
+			if tile != '0' and tile != '4' and tile != '5' and tile != '6' and tile != '7' and tile != '8' and tile != '9' and tile != 'b' and tile != 't' and tile != 'f' and tile != 's' and tile != 'd' and tile != 'D' and tile != 'p':
 				tile_rects.append(pygame.Rect(x*8,y*8,8,8))
 			x += 1
 		y += 1
@@ -219,7 +256,8 @@ while True:
 			if event.key == pygame.K_UP:
 				if air_timer < 0.5:
 					player_y_momentum = -150 * dt
-					#advance_level()
+			if event.key == pygame.K_ESCAPE:
+				title()
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_RIGHT:
 				moving_right = False
