@@ -72,7 +72,7 @@ animation_database = {}
 #animation_database['run'] = load_animation('player_animations/run',[7,7])
 #animation_database['idle'] = load_animation('player_animations/idle',[7,7,40])
 
-player_rect = pygame.Rect(0, 169, player_image.get_width(), player_image.get_height())
+player_rect = pygame.Rect(20, 65, player_image.get_width(), player_image.get_height())
 test_rect = pygame.Rect(100,100,100,50)
 
 game_map = {}
@@ -101,6 +101,8 @@ leaf_bottom = pygame.image.load('./img/leaf_oneSide_bottom.png')
 leaf_top = pygame.image.load('./img/leaf_oneSide_top.png')
 
 tuft_image = pygame.image.load('./img/tuft.png').convert_alpha()
+aaa_img = pygame.image.load('./img/aaaaaaaaaaaaaa.png').convert_alpha()
+aaa2 = pygame.image.load('./img/aaaaaaaaaaaaaa2.png').convert_alpha()
 
 tile_index = {1:grass_image,
 			2:dirt_image,
@@ -148,7 +150,17 @@ def move(rect, movement, tiles):
 	return rect, collision_types
 
 def draw_hardcoded():
-	pygame.draw.rect(screen,(0, 255, 0),(63-scroll[0],57-scroll[1],10,10))
+	#pygame.draw.rect(screen,(0, 255, 0),(63-scroll[0],57-scroll[1],10,10))
+	screen.blit(aaa_img, (50-scroll[0], 209-scroll[1]))
+	screen.blit(aaa_img, (114-scroll[0], 209-scroll[1]))
+	screen.blit(aaa2, (114-scroll[0], 334-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
+
 
 def advance_level():
 	global game_map, level_number
@@ -163,16 +175,17 @@ advance_level()
 Game = True
 
 while True:
-	print(game_map)
-
+	print(player_rect)
+	
 	if Game == True:
-		if player_rect.x > 80 and player_rect.x < 200:
+		if player_rect.x > 80 and player_rect.x < 200 and level_number == 2:
 			Game = False
 			advance_level()
 	if Game == False:
-		print(player_rect)
 		if player_rect.x < 80 or player_rect.x > 200:
 			Game = True
+	if Game == True and player_rect.y > 200:
+		advance_level()
 	
 	screen.fill((130, 139, 245))
 
@@ -243,6 +256,7 @@ while True:
 		air_timer += 0.05
 
 	screen.blit(player_image,(player_rect.x-scroll[0],player_rect.y-scroll[1]))
+	draw_hardcoded()
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -264,6 +278,6 @@ while True:
 			if event.key == pygame.K_LEFT:
 				moving_left = False
 
-
+	print("fps:" + str(clock.get_fps()))
 	pygame.display.update()
 	dt = min(clock.tick(60)/1000, 0.016)
