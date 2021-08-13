@@ -103,6 +103,9 @@ leaf_top = pygame.image.load('./img/leaf_oneSide_top.png')
 tuft_image = pygame.image.load('./img/tuft.png').convert_alpha()
 aaa_img = pygame.image.load('./img/aaaaaaaaaaaaaa.png').convert_alpha()
 aaa2 = pygame.image.load('./img/aaaaaaaaaaaaaa2.png').convert_alpha()
+interact_img = pygame.image.load('./img/interact.png').convert_alpha()
+locked_dialouge = pygame.image.load('./img/locked.png').convert_alpha()
+egg = pygame.image.load('./img/egg.png').convert_alpha()
 
 tile_index = {1:grass_image,
 			2:dirt_image,
@@ -151,15 +154,15 @@ def move(rect, movement, tiles):
 
 def draw_hardcoded():
 	#pygame.draw.rect(screen,(0, 255, 0),(63-scroll[0],57-scroll[1],10,10))
-	screen.blit(aaa_img, (50-scroll[0], 209-scroll[1]))
-	screen.blit(aaa_img, (114-scroll[0], 209-scroll[1]))
-	screen.blit(aaa2, (114-scroll[0], 334-scroll[1]))
-	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
-	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
-	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
-	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
-	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
-	screen.blit(aaa2, (50-scroll[0], 334-scroll[1]))
+	screen.blit(aaa_img, (50-scroll[0], 109-scroll[1]))
+	screen.blit(aaa_img, (114-scroll[0], 109-scroll[1]))
+	screen.blit(aaa2, (114-scroll[0], 234-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 234-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 234-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 234-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 234-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 234-scroll[1]))
+	screen.blit(aaa2, (50-scroll[0], 234-scroll[1]))
 
 
 def advance_level():
@@ -174,7 +177,13 @@ def advance_level():
 advance_level()
 Game = True
 
+showing_dialouge = False
+
 while True:
+	
+	if level_number == 3 and player_rect.y > 200:
+		advance_level()
+
 	print(player_rect)
 	
 	if Game == True:
@@ -184,10 +193,13 @@ while True:
 	if Game == False:
 		if player_rect.x < 80 or player_rect.x > 200:
 			Game = True
-	if Game == True and player_rect.y > 200:
+	if Game == True and player_rect.y > 200 and player_rect.y < 201:
 		advance_level()
 	
-	screen.fill((130, 139, 245))
+	if level_number == 2 or level_number == 3:
+		screen.fill((130, 139, 245))
+	else:
+		screen.fill((54, 58, 66))
 
 	true_scroll[0] += (player_rect.x-true_scroll[0]-32)/20
 	true_scroll[1] += (player_rect.y-true_scroll[1]-32)/20
@@ -226,6 +238,8 @@ while True:
 				screen.blit(leaf_top, (x*8-scroll[0], y*8-scroll[1]))
 			if tile == '4':
 				screen.blit(trunk_image, (x*8-scroll[0], y*8-scroll[1]))
+			if tile == 'q':
+				screen.blit(trunk_image, (x*8-scroll[0], y*8-scroll[1]))
 			if tile == '3':
 				screen.blit(stone_image, (x*8-scroll[0],y*8-scroll[1]))
 			if tile == '2':
@@ -256,6 +270,14 @@ while True:
 		air_timer += 0.05
 
 	screen.blit(player_image,(player_rect.x-scroll[0],player_rect.y-scroll[1]))
+	screen.blit(egg, (255-scroll[0], 211-scroll[1]))
+
+	if player_rect.x > 28 and player_rect.x < 37 and showing_dialouge == False:
+		screen.blit(interact_img, (46, 2))
+		showing_interact = True
+	if player_rect.x > 28 and player_rect.x < 37 and showing_dialouge == True:
+		screen.blit(locked_dialouge, (-128, 1))
+
 	draw_hardcoded()
 
 	for event in pygame.event.get():
@@ -272,12 +294,18 @@ while True:
 					player_y_momentum = -150 * dt
 			if event.key == pygame.K_ESCAPE:
 				title()
+			if event.key == pygame.K_x:
+				if showing_interact == True and showing_dialouge == False:
+					showing_dialouge = True
+			if event.key == pygame.K_DOWN:
+				if showing_dialouge == True:
+					showing_dialouge = False
 		if event.type == pygame.KEYUP:
 			if event.key == pygame.K_RIGHT:
 				moving_right = False
 			if event.key == pygame.K_LEFT:
 				moving_left = False
 
-	print("fps:" + str(clock.get_fps()))
+	#print("fps:" + str(clock.get_fps()))
 	pygame.display.update()
 	dt = min(clock.tick(60)/1000, 0.016)
