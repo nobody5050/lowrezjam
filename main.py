@@ -6,6 +6,7 @@ dt = min(clock.tick(60)/1000, 0.016)
 pygame.init()
 pygame.display.set_caption('lowrezjam 2021')
 screen = pygame.display.set_mode((64, 64), pygame.SCALED)
+font = pygame.font.Font("font.ttf", 10)
 
 level_number = 1
 
@@ -179,12 +180,18 @@ Game = True
 
 showing_dialouge = False
 
+time_in_course = 0
+
 while True:
 	
 	if level_number == 3 and player_rect.y > 200:
 		advance_level()
 
-	print(player_rect)
+	if player_rect.x > 223 and player_rect.x < 1306:
+		time_in_course += dt
+		timer = font.render(str(round(time_in_course, 2)), True, (255, 255, 255))
+
+	#print(player_rect)
 	
 	if Game == True:
 		if player_rect.x > 80 and player_rect.x < 200 and level_number == 2:
@@ -271,6 +278,8 @@ while True:
 
 	screen.blit(player_image,(player_rect.x-scroll[0],player_rect.y-scroll[1]))
 	screen.blit(egg, (255-scroll[0], 211-scroll[1]))
+	screen.blit(timer, (2, -2))
+
 
 	if player_rect.x > 28 and player_rect.x < 37 and showing_dialouge == False:
 		screen.blit(interact_img, (46, 2))
