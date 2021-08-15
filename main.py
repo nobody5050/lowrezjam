@@ -7,6 +7,8 @@ pygame.init()
 pygame.display.set_caption('lowrezjam 2021')
 screen = pygame.display.set_mode((64, 64), pygame.SCALED)
 font = pygame.font.Font("font.ttf", 10)
+timer = font.render("", True, (255, 255, 255))
+talking_text = font.render("", True, (255, 255, 255))
 
 level_number = 1
 
@@ -107,12 +109,16 @@ aaa2 = pygame.image.load('./img/aaaaaaaaaaaaaa2.png').convert_alpha()
 interact_img = pygame.image.load('./img/interact.png').convert_alpha()
 locked_dialouge = pygame.image.load('./img/locked.png').convert_alpha()
 egg = pygame.image.load('./img/egg.png').convert_alpha()
+win = pygame.image.load('./img/win.png').convert_alpha()
 
 tile_index = {1:grass_image,
 			2:dirt_image,
 			3:stone_image,
 			4:trunk_image
 			}
+
+showing_interact = False
+showing_dialouge = False
 
 def load_map(path):
 	f = open(path + '.txt','r')
@@ -187,11 +193,28 @@ while True:
 	if level_number == 3 and player_rect.y > 200:
 		advance_level()
 
-	if player_rect.x > 223 and player_rect.x < 1306:
+	if player_rect.x > 223 and player_rect.x < 1306 and level_number == 4:
 		time_in_course += dt
 		timer = font.render(str(round(time_in_course, 2)), True, (255, 255, 255))
 
-	#print(player_rect)
+	if player_rect.x > 1306:
+		win = True
+		while win:
+			image = pygame.image.load('./img/win.png')
+
+			screen.blit(image, (0,0))
+
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+					sys.exit()
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_RETURN:
+						title = False
+			pygame.display.update()
+			dt = min(clock.tick(60)/1000, 0.016)
+
+	print(player_rect)
 	
 	if Game == True:
 		if player_rect.x > 80 and player_rect.x < 200 and level_number == 2:
@@ -279,14 +302,19 @@ while True:
 	screen.blit(player_image,(player_rect.x-scroll[0],player_rect.y-scroll[1]))
 	screen.blit(egg, (255-scroll[0], 211-scroll[1]))
 	screen.blit(timer, (2, -2))
+	screen.blit(talking_text, (2, 4))
 
 
-	if player_rect.x > 28 and player_rect.x < 37 and showing_dialouge == False:
+	if player_rect.x > 28 and player_rect.x < 37 and showing_dialouge == False and player_rect.y == 65:
 		screen.blit(interact_img, (46, 2))
 		showing_interact = True
-	if player_rect.x > 28 and player_rect.x < 37 and showing_dialouge == True:
+	if player_rect.x > 28 and player_rect.x < 37 and showing_dialouge == True and player_rect.y == 65:
 		screen.blit(locked_dialouge, (-128, 1))
-
+	
+	if player_rect.x > 194 and player_rect.x < 207 and showing_interact == True:
+		screen.blit(interact_img, (46, 2))
+		talking = True
+	
 	draw_hardcoded()
 
 	for event in pygame.event.get():
@@ -306,6 +334,11 @@ while True:
 			if event.key == pygame.K_x:
 				if showing_interact == True and showing_dialouge == False:
 					showing_dialouge = True
+				if talking == True and player_rect.y == 457:
+					talking_text = font.render("Goal: 18.22", True, (255, 255, 255))
+			if event.key == pygame.K_p:
+				player_rect.x = 194
+				player_rect.y = 457
 			if event.key == pygame.K_DOWN:
 				if showing_dialouge == True:
 					showing_dialouge = False
